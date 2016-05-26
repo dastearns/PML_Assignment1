@@ -1,0 +1,101 @@
+---
+title: "Weight Lifting Exercises Analysis"
+author: "Daniel A Stearns"
+date: "May 26, 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+##install.packages("doParallel")
+
+echo = TRUE
+options(scipen = 1)  
+knitr::opts_chunk$set(cache=TRUE)
+set.seed(256)
+
+## load libraries
+library("caret")
+library("randomForest")
+library("Hmisc")
+library("foreach")
+library("doParallel")
+
+## Clear all environment variables for a clean workspace
+
+## Set Working Directory
+setwd("~/Coursera/practical machine learning/PML_Assignment1")
+
+```
+#Summary
+Using devices such as Jawbone Up, Nike FuelBand, and Fitbit it is now possible to collect a large amount of data about personal activity relatively inexpensively. These type of devices are part of the quantified self movement - a group of enthusiasts who take measurements about themselves regularly to improve their health, to find patterns in their behavior, or because they are tech geeks. One thing that people regularly do is quantify how much of a particular activity they do, but they rarely quantify how well they do it. In this project, your goal will be to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. They were asked to perform barbell lifts correctly and incorrectly in 5 different ways. More information is available from the website here: http://groupware.les.inf.puc-rio.br/har (see the section on the Weight Lifting Exercise Dataset).
+
+#Data
+The training data for this project are available here:
+https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv
+
+The test data are available here:
+https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv
+
+The data for this project come from this source: http://groupware.les.inf.puc-rio.br/har. If you use the document you create for this class for any purpose please cite them as they have been very generous in allowing their data to be used for this kind of assignment.
+
+#Processing
+Load the data sets for analysis.
+```{r}
+src_training <- read.csv("pml-training.csv", header = TRUE, na.strings = c("NA", "", "#DIV/0!"));
+src_testing <- read.csv("pml-testing.csv", header = TRUE, na.strings = c("NA", "", "#DIV/0!"));
+```
+
+#Cleansing
+Clean the data set to remove unnecessary columns and columns with bad data.
+```{r}
+valid_attributes <- colnames(src_training[colSums(is.na(src_training)) == 0])[-(1:7)];
+training_data <- src_training[valid_attributes];
+testing_data <- src_testing[valid_attributes[valid_attributes!='classe']];
+```
+
+#Analysis
+Review the data set to see what we are working with.
+```{r}
+dim(training_data);
+colnames(training_data);
+head(training_data);
+
+```
+
+#Partioning
+Partioning the training data set into two data sets, 60% for training data set  and 40% for testing data set:.
+```{r}
+partition <- createDataPartition(y=training_data$classe, p=0.6, list=FALSE )
+training_set <- training_data[partition,]
+testing_set <- training_data[-partition,]
+```
+
+#Learning
+Use Random Forests for ML.
+```{r}
+rf_ml <- randomForest(training_set[-ncol(training_set)], training_set$classe)
+
+predictions_training <- predict(rf_ml, newdata=training_set)
+confusionMatrix(predictions_training,training_set$classe)
+
+predictions_testing <- predict(rf_ml, newdata=testing_set)
+confusionMatrix(predictions_testing,testing_set$classe)
+
+predictions <- predict(rf_ml, newdata=testing_data)
+```
+
+#Conclusions
+it can be determined that the Randon Forest Machine Learning Algorithm yields an accuracy of 99.51% in determining the exercise is correctly performed.
+
+#Appendix
+Generating Testing Files 
+```{r}
+pml_write_files = function(x){
+  n = length(x)
+  for(i in 1:n){
+    filename = paste0("problem_id_",i,".txt")
+    write.table(x[i],file=filename,quote=FALSE,row.names=FALSE,col.names=FALSE)
+  }
+}
+pml_write_files(predictions)
+```
