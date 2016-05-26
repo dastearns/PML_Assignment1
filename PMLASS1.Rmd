@@ -82,20 +82,8 @@ predictions_testing <- predict(rf_ml, newdata=testing_set)
 confusionMatrix(predictions_testing,testing_set$classe)
 
 predictions <- predict(rf_ml, newdata=testing_data)
+predictions
 ```
 
 #Conclusions
 it can be determined that the Randon Forest Machine Learning Algorithm yields an accuracy of 99.51% in determining the exercise is correctly performed.
-
-#Appendix
-Generating Testing Files 
-```{r}
-pml_write_files = function(x){
-  n = length(x)
-  for(i in 1:n){
-    filename = paste0("problem_id_",i,".txt")
-    write.table(x[i],file=filename,quote=FALSE,row.names=FALSE,col.names=FALSE)
-  }
-}
-pml_write_files(predictions)
-```

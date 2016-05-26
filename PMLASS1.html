@@ -334,23 +334,15 @@ confusionMatrix(predictions_testing,testing_set$classe)</code></pre>
 ## Detection Rate         0.2841   0.1922   0.1731   0.1612   0.1828
 ## Detection Prevalence   0.2850   0.1939   0.1760   0.1621   0.1830
 ## Balanced Accuracy      0.9987   0.9957   0.9946   0.9913   0.9971</code></pre>
-<pre class="r"><code>predictions &lt;- predict(rf_ml, newdata=testing_data)</code></pre>
+<pre class="r"><code>predictions &lt;- predict(rf_ml, newdata=testing_data)
+predictions</code></pre>
+<pre><code>##  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 
+##  B  A  B  A  A  E  D  B  A  A  B  C  B  A  E  E  A  B  B  B 
+## Levels: A B C D E</code></pre>
 </div>
 <div id="conclusions" class="section level1">
 <h1>Conclusions</h1>
 <p>it can be determined that the Randon Forest Machine Learning Algorithm yields an accuracy of 99.51% in determining the exercise is correctly performed.</p>
-</div>
-<div id="appendix" class="section level1">
-<h1>Appendix</h1>
-<p>Generating Testing Files</p>
-<pre class="r"><code>pml_write_files = function(x){
-  n = length(x)
-  for(i in 1:n){
-    filename = paste0(&quot;problem_id_&quot;,i,&quot;.txt&quot;)
-    write.table(x[i],file=filename,quote=FALSE,row.names=FALSE,col.names=FALSE)
-  }
-}
-pml_write_files(predictions)</code></pre>
 </div>
 
 
